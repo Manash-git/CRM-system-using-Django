@@ -35,5 +35,17 @@ def products(request):
     products = Product.objects.all()
     return render(request, 'CoffeeShop/products.html', {'products':products})
 
-def customers(request):
-    return render(request, 'CoffeeShop/customers.html')
+def customers(request,pk):
+    
+    # queries from database
+    customer= Customer.objects.get(id=pk)
+    orders= customer.order_set.all()
+    order_count = orders.count()
+    
+    container = {
+        'customer':customer,
+        'orders':orders,
+        'order_count':order_count
+    }
+    
+    return render(request, 'CoffeeShop/customers.html', container)
