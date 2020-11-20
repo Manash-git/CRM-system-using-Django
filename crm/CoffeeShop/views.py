@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import *
+from .orderForm import createOrderFrom
 
 # Create your views here.
 
@@ -49,3 +50,17 @@ def customers(request,pk):
     }
     
     return render(request, 'CoffeeShop/customers.html', container)
+
+def createOrder(request):
+    form = createOrderFrom()
+    
+    if request.method == 'POST':
+        form = createOrderFrom(request.POST)
+        
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+    
+    container = {'form':form}
+    
+    return render(request,'CoffeeShop/createOrder.html', container)
