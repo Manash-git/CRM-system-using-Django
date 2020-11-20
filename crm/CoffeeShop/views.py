@@ -81,3 +81,12 @@ def updateOrder(request,pk):
     container = {'form':form}
     
     return render(request,'CoffeeShop/createOrder.html', container)
+
+def deleteOrder(request, pk):
+    order = Order.objects.get(id=pk)
+    
+    if request.method == 'POST':
+        order.delete()
+        return redirect('/')
+    container ={'item':order}
+    return render(request, 'CoffeeShop/deleteOrder.html', container)
