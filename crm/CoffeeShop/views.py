@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import *
-from .orderForm import createOrderFrom
+from .orderForm import createOrderForm
+from django.forms import inlineformset_factory
 
 # Create your views here.
 
@@ -51,17 +52,30 @@ def customers(request,pk):
     
     return render(request, 'CoffeeShop/customers.html', container)
 
-def createOrder(request):
-    form = createOrderFrom()
+def createOrder(request, pk):
+    ########## Normal ways #############
+    # form = createOrderForm ()
+    # if request.method == 'POST':
+    #     form = createOrderForm(request.POST)
+        
+    #     if form.is_valid():
+    #         form.save()
+    #         return redirect('/')
+    
+    # container = {'form':form}
+    
+    ######### Formset ways ################
+    orderFormSet = inlineformset_factory( Customer, Order, fields = ('product','status'), extra = 3)
+    customer = Customer.objects.get(id=pk)
+    formset = orderFormSet(queryset=Order.objects.none(),instance=customer)
     
     if request.method == 'POST':
-        form = createOrderFrom(request.POST)
-        
-        if form.is_valid():
-            form.save()
+        formset = orderFormSet(request.POST, instance=customer)
+        if formset.is_valid():
+            formset.save()
             return redirect('/')
     
-    container = {'form':form}
+    container = {'formset':formset}
     
     return render(request,'CoffeeShop/createOrder.html', container)
 
