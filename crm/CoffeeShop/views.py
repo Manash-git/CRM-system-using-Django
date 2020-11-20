@@ -64,3 +64,20 @@ def createOrder(request):
     container = {'form':form}
     
     return render(request,'CoffeeShop/createOrder.html', container)
+
+
+
+def updateOrder(request,pk):
+    order = Order.objects.get(id=pk)
+    form = createOrderFrom(instance = order)
+    
+    if request.method == 'POST':
+        form = createOrderFrom(request.POST, instance = order)
+        
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+    
+    container = {'form':form}
+    
+    return render(request,'CoffeeShop/createOrder.html', container)
