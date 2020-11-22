@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from .models import *
 from .orderForm import createOrderForm
 from django.forms import inlineformset_factory
+from .orderFilter import OrderFilter
+
 
 # Create your views here.
 
@@ -33,9 +35,18 @@ def home(request):
     
     return render(request, 'CoffeeShop/dashboard.html', container)
 
+
+
+
 def products(request):
     products = Product.objects.all()
+    
+    
     return render(request, 'CoffeeShop/products.html', {'products':products})
+
+
+
+
 
 def customers(request,pk):
     
@@ -44,13 +55,26 @@ def customers(request,pk):
     orders= customer.order_set.all()
     order_count = orders.count()
     
+    ########  Order filter code start #############
+    
+    myFilter = OrderFilter(request.GET, queryset = orders)
+    orders = myFilter.qs
+    
+    
+    ########  Order filter code end #############
+    
+    
     container = {
         'customer':customer,
         'orders':orders,
-        'order_count':order_count
+        'order_count':order_count,
+        'myFilter':myFilter,
     }
     
     return render(request, 'CoffeeShop/customers.html', container)
+
+
+
 
 def createOrder(request, pk):
     ########## Normal ways #############
@@ -95,6 +119,10 @@ def updateOrder(request,pk):
     container = {'form':form}
     
     return render(request,'CoffeeShop/createOrder.html', container)
+
+
+
+
 
 def deleteOrder(request, pk):
     order = Order.objects.get(id=pk)
